@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#0f1117;--bg2:#161b27;--bg3:#1e2537;--bg4:#242d42;
+--border:#2a3347;--border2:#3a4560;
+--text:#e8ecf4;--text2:#8b97b5;--text3:#5a6580;
+--accent:#4f7dff;--accent2:#3d6aee;--accent-bg:rgba(79,125,255,0.12);
+--green:#22c55e;--green-bg:rgba(34,197,94,0.12);
+--amber:#f59e0b;--amber-bg:rgba(245,158,11,0.12);
+--red:#ef4444;--red-bg:rgba(239,68,68,0.12);
+--purple:#a855f7;--purple-bg:rgba(168,85,247,0.12);
+--teal:#14b8a6;--teal-bg:rgba(20,184,166,0.12);
+--radius:8px;--radius-lg:12px;--radius-xl:16px;
+--shadow:0 1px 3px rgba(0,0,0,0.4);
+--font:'SF Pro Display',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5}
+.app{display:flex;min-height:100vh}
+.sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform 0.3s}
+.sidebar-logo{padding:20px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0}
+.logo-text{font-weight:600;font-size:15px;color:var(--text)}
+.logo-sub{font-size:10px;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase;margin-top:1px}
+.sidebar-section{padding:12px 0}
+.sidebar-label{padding:4px 16px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 16px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;transition:all 0.15s;position:relative;margin:1px 8px;border-radius:var(--radius)}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accent-bg);color:var(--accent)}
+.nav-item .nav-icon{font-size:16px;width:18px;text-align:center;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
+.sidebar-bottom{margin-top:auto;padding:12px 8px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:8px 8px;border-radius:var(--radius);cursor:pointer;transition:background 0.15s}
+.user-card:hover{background:var(--bg3)}
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:11px;color:var(--text3)}
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:16px;font-weight:700;color:var(--text);flex:1}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;border:none;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,0.2)}
+.btn-success{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,197,94,0.2)}
+.icon-btn{width:32px;height:32px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);transition:all 0.15s;background:transparent;border:1px solid var(--border)}
+.icon-btn:hover{background:var(--bg3);color:var(--text)}
+.content{padding:24px;flex:1}
+.page{display:none}
+.page.active{display:block}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.section-title{font-size:20px;font-weight:700;color:var(--text)}
+.section-sub{font-size:13px;color:var(--text3);margin-top:2px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 20px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;right:0;width:60px;height:60px;border-radius:0 var(--radius-lg) 0 60px;opacity:0.08}
+.kpi-card.blue::before{background:var(--accent)}
+.kpi-card.green::before{background:var(--green)}
+.kpi-card.amber::before{background:var(--amber)}
+.kpi-card.purple::before{background:var(--purple)}
+.kpi-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px}
+.kpi-value{font-size:28px;font-weight:800;color:var(--text);margin:6px 0 2px;line-height:1}
+.kpi-change{font-size:12px;font-weight:500}
+.kpi-change.up{color:var(--green)}
+.kpi-change.down{color:var(--red)}
+.kpi-change.neutral{color:var(--text3)}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.tag-draft{background:rgba(91,107,140,0.15);color:#8b97b5}
+.tag-submitted{background:var(--amber-bg);color:var(--amber)}
+.tag-approved{background:var(--green-bg);color:var(--green)}
+.tag-rejected{background:var(--red-bg);color:var(--red)}
+.tag-locked{background:var(--purple-bg);color:var(--purple)}
+.tag-ontrack{background:var(--green-bg);color:var(--green)}
+.tag-notstarted{background:rgba(91,107,140,0.15);color:#8b97b5}
+.tag-completed{background:var(--teal-bg);color:var(--teal)}
+.tag-critical{background:var(--red-bg);color:var(--red)}
+.goal-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px;transition:border-color 0.2s,box-shadow 0.2s}
+.goal-card:hover{border-color:var(--border2)}
+.goal-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.goal-title{font-size:14px;font-weight:600;color:var(--text)}
+.goal-meta{font-size:12px;color:var(--text3);margin-top:3px}
+.progress-bar-wrap{background:var(--bg3);border-radius:20px;height:6px;overflow:hidden;margin:6px 0}
+.progress-bar{height:100%;border-radius:20px;transition:width 0.6s}
+.progress-bar.green{background:var(--green)}
+.progress-bar.amber{background:var(--amber)}
+.progress-bar.blue{background:var(--accent)}
+.progress-bar.red{background:var(--red)}
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th{background:var(--bg3);color:var(--text3);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+td{padding:12px 14px;border-bottom:1px solid var(--border);color:var(--text2);font-size:13px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,0.02);color:var(--text)}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color 0.15s}
+.form-input:focus{border-color:var(--accent)}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%238b97b5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:10px}
+.form-error{font-size:11px;color:var(--red);margin-top:4px}
+.validation-bar{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px}
+.validation-bar.valid{border-color:rgba(34,197,94,0.3);background:var(--green-bg)}
+.validation-bar.invalid{border-color:rgba(239,68,68,0.3);background:var(--red-bg)}
+.weightage-total{font-size:22px;font-weight:800}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xl);padding:24px;width:540px;max-width:95vw;max-height:85vh;overflow-y:auto;transform:scale(0.95);transition:transform 0.2s}
+.modal-overlay.open .modal{transform:scale(1)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:16px;font-weight:700;color:var(--text)}
+.close-btn{width:28px;height:28px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);transition:all 0.15s;background:var(--bg3)}
+.close-btn:hover{background:var(--border);color:var(--text)}
+.toast-container{position:fixed;top:16px;right:16px;z-index:500;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px;min-width:280px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,0.5);animation:slideIn 0.3s ease;font-size:13px}
+.toast.success{border-left:3px solid var(--green)}
+.toast.error{border-left:3px solid var(--red)}
+.toast.info{border-left:3px solid var(--accent)}
+.toast.warning{border-left:3px solid var(--amber)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes fadeOut{to{opacity:0;transform:translateX(100%)}}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.empty-state{text-align:center;padding:48px 24px;color:var(--text3)}
+.empty-state .empty-icon{font-size:40px;margin-bottom:12px;opacity:0.4}
+.empty-state p{font-size:14px;margin-top:6px}
+.circular-progress{position:relative;display:inline-flex}
+.circular-progress svg{transform:rotate(-90deg)}
+.cp-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--text)}
+.activity-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.activity-content{flex:1}
+.activity-text{font-size:13px;color:var(--text2)}
+.activity-text strong{color:var(--text)}
+.activity-time{font-size:11px;color:var(--text3);margin-top:2px}
+.notification-dot{width:8px;height:8px;background:var(--red);border-radius:50%;position:absolute;top:6px;right:6px}
+.role-switcher{display:flex;gap:6px;padding:8px;background:var(--bg3);border-radius:var(--radius-lg);border:1px solid var(--border)}
+.role-btn{padding:6px 12px;border-radius:var(--radius);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;color:var(--text3);background:transparent;border:none}
+.role-btn.active{background:var(--accent);color:#fff}
+.search-bar{position:relative}
+.search-bar input{padding-left:32px;width:200px}
+.search-bar .si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px}
+.progress-ring{display:block}
+.inline-edit{border:none;background:transparent;color:var(--text);font-size:13px;font-family:inherit;outline:none;border-bottom:1px dashed var(--border2);padding:2px 4px;width:80px}
+.inline-edit:focus{border-bottom-color:var(--accent)}
+.ai-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--purple-bg);border:1px solid rgba(168,85,247,0.2);border-radius:20px;font-size:11px;font-weight:600;color:var(--purple);cursor:pointer;transition:all 0.15s}
+.ai-chip:hover{background:rgba(168,85,247,0.2)}
+.escalation-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.esc-icon{width:36px;height:36px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.cycle-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--accent-bg);border:1px solid rgba(79,125,255,0.2);border-radius:20px;font-size:11px;font-weight:600;color:var(--accent)}
+.heatmap-cell{border-radius:4px;cursor:pointer;transition:opacity 0.15s}
+.heatmap-cell:hover{opacity:0.8}
+.scrollable{max-height:400px;overflow-y:auto}
+.scrollable::-webkit-scrollbar{width:4px}
+.scrollable::-webkit-scrollbar-track{background:transparent}
+.scrollable::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.tooltip{position:relative}
+.tooltip::after{content:attr(data-tip);position:absolute;bottom:calc(100%+6px);left:50%;transform:translateX(-50%);background:var(--bg4);color:var(--text);font-size:11px;padding:4px 8px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:100;border:1px solid var(--border)}
+.tooltip:hover::after{opacity:1}
+.shimmer{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--radius);height:16px;margin-bottom:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+.login-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xl);padding:40px;width:420px;max-width:95vw}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:32px}
+.demo-accounts{background:var(--bg3);border-radius:var(--radius-lg);padding:16px;margin-bottom:20px;border:1px solid var(--border)}
+.demo-acc-btn{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius);cursor:pointer;transition:all 0.15s;width:100%;background:transparent;border:none;color:var(--text2);text-align:left;font-size:13px;margin-bottom:4px}
+.demo-acc-btn:last-child{margin-bottom:0}
+.demo-acc-btn:hover{background:var(--bg4);color:var(--text)}
+.demo-acc-btn .avatar{width:28px;height:28px;font-size:10px}
+.chart-container{position:relative;height:220px}
+</style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div id="loginPage" class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-mark" style="width:44px;height:44px;font-size:18px;border-radius:12px">G</div>
+      <div>
+        <div style="font-size:20px;font-weight:800;color:var(--text)">GoalSync</div>
+        <div style="font-size:12px;color:var(--text3);letter-spacing:0.5px">Enterprise Performance Portal</div>
+      </div>
+    </div>
+    <div class="demo-accounts">
+      <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">Quick Login — Demo Accounts</div>
+      <button class="demo-acc-btn" onclick="login('employee')">
+        <div class="avatar" style="background:var(--accent-bg);color:var(--accent)">AK</div>
+        <div><div style="font-weight:600;color:var(--text)">Arjun Kumar</div><div style="font-size:11px;color:var(--text3)">employee@demo.com · Employee</div></div>
+      </button>
+      <button class="demo-acc-btn" onclick="login('manager')">
+        <div class="avatar" style="background:var(--green-bg);color:var(--green)">PS</div>
+        <div><div style="font-weight:600;color:var(--text)">Priya Sharma</div><div style="font-size:11px;color:var(--text3)">manager@demo.com · Manager</div></div>
+      </button>
+      <button class="demo-acc-btn" onclick="login('admin')">
+        <div class="avatar" style="background:var(--purple-bg);color:var(--purple)">RV</div>
+        <div><div style="font-weight:600;color:var(--text)">Rohan Verma</div><div style="font-size:11px;color:var(--text3)">admin@demo.com · HR Admin</div></div>
+      </button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" id="loginEmail" placeholder="Enter your email" value="employee@demo.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-input" type="password" placeholder="••••••••" value="demo1234">
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:10px" onclick="loginBtn()">
+      Sign In to GoalSync →
+    </button>
+  </div>
+</div>
+
+<div id="appShell" style="display:none">
+<div class="app">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">G</div>
+      <div>
+        <div class="logo-text">GoalSync</div>
+        <div class="logo-sub">Performance Portal</div>
+      </div>
+    </div>
+    <div style="padding:10px 8px">
+      <div class="role-switcher" id="roleSwitcher">
+        <button class="role-btn active" onclick="switchRole('employee')">Employee</button>
+        <button class="role-btn" onclick="switchRole('manager')">Manager</button>
+        <button class="role-btn" onclick="switchRole('admin')">Admin</button>
+      </div>
+    </div>
+    <div id="navItems" style="flex:1;overflow-y:auto"></div>
+    <div class="sidebar-bottom">
+      <div class="user-card" id="userCard">
+        <div class="avatar" id="sidebarAvatar" style="background:var(--accent-bg);color:var(--accent)">AK</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">Arjun Kumar</div>
+          <div class="user-role" id="sidebarRole">Employee</div>
+        </div>
+        <span onclick="logout()" style="cursor:pointer;color:var(--text3);font-size:14px" title="Logout">⇥</span>
+      </div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-right">
+        <div class="search-bar">
+          <span class="si">⌕</span>
+          <input class="form-input search-bar" placeholder="Search goals..." style="width:180px;padding-left:28px">
+        </div>
+        <div class="icon-btn tooltip" data-tip="Notifications" onclick="showNotif()" style="position:relative">
+          🔔
+          <div class="notification-dot"></div>
+        </div>
+        <div class="cycle-chip" id="cycleChip">📅 FY 2024-25 · Q1</div>
+      </div>
+    </div>
+    <div class="content">
+      <div id="pageDashboard" class="page active"></div>
+      <div id="pageGoals" class="page"></div>
+      <div id="pageTeam" class="page"></div>
+      <div id="pageCheckIn" class="page"></div>
+      <div id="pageReports" class="page"></div>
+      <div id="pageAudit" class="page"></div>
+      <div id="pageCycles" class="page"></div>
+      <div id="pageEscalations" class="page"></div>
+      <div id="pageAnalytics" class="page"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="goalModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="goalModalTitle">Add New Goal</div>
+      <div class="close-btn" onclick="closeGoalModal()">✕</div>
+    </div>
+    <div id="goalModalBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="commentModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Manager Review</div>
+      <div class="close-btn" onclick="closeCommentModal()">✕</div>
+    </div>
+    <div id="commentModalBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="notifModal">
+  <div class="modal" style="width:400px">
+    <div class="modal-header">
+      <div class="modal-title">🔔 Notifications</div>
+      <div class="close-btn" onclick="closeNotifModal()">✕</div>
+    </div>
+    <div id="notifList"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const STATE = {
+  role: 'employee',
+  user: null,
+  currentPage: 'pageDashboard',
+  goals: [
+    {id:1,title:'Increase Revenue from Key Accounts',thrust:'Sales Excellence',desc:'Grow key account revenue by acquiring new clients and expanding existing portfolios',uom:'Numeric',target:50,weightage:25,status:'approved',progress:72,achievement:36,q1Status:'On Track',quarter:'Q1',createdBy:'employee',shared:false},
+    {id:2,title:'Improve Customer Satisfaction Score',thrust:'Customer Experience',desc:'Enhance NPS score through improved SLA adherence and proactive support',uom:'Percentage',target:85,weightage:20,status:'approved',progress:89,achievement:75,q1Status:'On Track',quarter:'Q1',createdBy:'employee',shared:false},
+    {id:3,title:'Complete AWS Cloud Migration',thrust:'Digital Transformation',desc:'Migrate legacy systems to AWS cloud architecture for improved scalability',uom:'Percentage',target:100,weightage:20,status:'approved',progress:45,achievement:45,q1Status:'On Track',quarter:'Q1',createdBy:'employee',shared:false},
+    {id:4,title:'Zero Critical Compliance Incidents',thrust:'Risk & Compliance',desc:'Maintain zero critical compliance incidents across all audits',uom:'Zero-Based',target:0,weightage:15,status:'submitted',progress:0,achievement:0,q1Status:'Not Started',quarter:'Q1',createdBy:'employee',shared:false},
+    {id:5,title:'Department OKR Alignment Score',thrust:'People & Culture',desc:'Shared departmental KPI pushed by management for team alignment',uom:'Percentage',target:90,weightage:20,status:'approved',progress:78,achievement:70,q1Status:'On Track',quarter:'Q1',createdBy:'manager',shared:true},
+  ],
+  teamGoals: [
+    {name:'Sneha Kapoor',role:'Software Engineer',submitted:true,approved:true,progress:68,goals:4},
+    {name:'Vikram Nair',role:'Product Analyst',submitted:true,approved:false,progress:0,goals:3},
+    {name:'Anita Roy',role:'UX Designer',submitted:false,approved:false,progress:0,goals:0},
+    {name:'Rahul Mehta',role:'Data Engineer',submitted:true,approved:true,progress:82,goals:5},
+    {name:'Meera Singh',role:'QA Lead',submitted:true,approved:true,progress:55,goals:4},
+  ],
+  auditLog: [
+    {time:'2 mins ago',user:'Priya Sharma',action:'Approved goal',detail:'"Increase Revenue from Key Accounts"',type:'approve'},
+    {time:'18 mins ago',user:'Arjun Kumar',action:'Updated achievement',detail:'AWS Migration: 40% → 45%',type:'edit'},
+    {time:'1 hour ago',user:'Rohan Verma',action:'Pushed shared goal',detail:'"Department OKR Alignment Score" to 8 employees',type:'admin'},
+    {time:'3 hours ago',user:'Arjun Kumar',action:'Submitted goal sheet',detail:'5 goals, total weightage 100%',type:'submit'},
+    {time:'Yesterday',user:'Priya Sharma',action:'Rejected goal',detail:'"Reduce Operational Cost" — target too vague',type:'reject'},
+    {time:'2 days ago',user:'Rohan Verma',action:'Unlocked goals',detail:'Arjun Kumar — Q1 amendment window',type:'admin'},
+  ],
+  notifications: [
+    {type:'success',msg:'Your goals were approved by Priya Sharma',time:'2m ago'},
+    {type:'info',msg:'Q1 check-in window is now open until July 31',time:'1h ago'},
+    {type:'warning',msg:'3 team members have not submitted goals',time:'3h ago'},
+    {type:'error',msg:'Escalation: Vikram Nair approval pending > 5 days',time:'1d ago'},
+  ],
+  charts:{},
+};
+
+const USERS = {
+  employee:{name:'Arjun Kumar',initials:'AK',email:'employee@demo.com',role:'Employee',dept:'Engineering',manager:'Priya Sharma',color:'var(--accent)',bgColor:'var(--accent-bg)'},
+  manager:{name:'Priya Sharma',initials:'PS',email:'manager@demo.com',role:'Manager',dept:'Engineering',team:['Arjun Kumar','Sneha Kapoor','Vikram Nair','Anita Roy','Rahul Mehta','Meera Singh'],color:'var(--green)',bgColor:'var(--green-bg)'},
+  admin:{name:'Rohan Verma',initials:'RV',email:'admin@demo.com',role:'HR Admin',dept:'HR & Operations',color:'var(--purple)',bgColor:'var(--purple-bg)'},
+};
+
+const NAV = {
+  employee:[
+    {id:'pageDashboard',icon:'📊',label:'Dashboard'},
+    {id:'pageGoals',icon:'🎯',label:'My Goals'},
+    {id:'pageCheckIn',icon:'✅',label:'Check-ins'},
+    {id:'pageAnalytics',icon:'📈',label:'Analytics'},
+  ],
+  manager:[
+    {id:'pageDashboard',icon:'📊',label:'Dashboard'},
+    {id:'pageTeam',icon:'👥',label:'Team Goals',badge:2},
+    {id:'pageGoals',icon:'🎯',label:'My Goals'},
+    {id:'pageCheckIn',icon:'✅',label:'Check-ins'},
+    {id:'pageAnalytics',icon:'📈',label:'Analytics'},
+    {id:'pageReports',icon:'📋',label:'Reports'},
+  ],
+  admin:[
+    {id:'pageDashboard',icon:'📊',label:'Dashboard'},
+    {id:'pageCycles',icon:'🔄',label:'Cycles'},
+    {id:'pageTeam',icon:'👥',label:'All Employees'},
+    {id:'pageEscalations',icon:'⚡',label:'Escalations',badge:3},
+    {id:'pageAudit',icon:'🔍',label:'Audit Logs'},
+    {id:'pageReports',icon:'📋',label:'Reports'},
+    {id:'pageAnalytics',icon:'📈',label:'Analytics'},
+  ],
+};
+
+function login(role){
+  const emails = {employee:'employee@demo.com',manager:'manager@demo.com',admin:'admin@demo.com'};
+  document.getElementById('loginEmail').value = emails[role];
+  loginBtn(role);
+}
+function loginBtn(forceRole){
+  const email = document.getElementById('loginEmail').value;
+  let role = forceRole || Object.keys(USERS).find(r=>USERS[r].email===email) || 'employee';
+  STATE.role = role;
+  STATE.user = USERS[role];
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('appShell').style.display='block';
+  initApp();
+  toast('success',`Welcome back, ${STATE.user.name}! 👋`);
+}
+function logout(){
+  document.getElementById('loginPage').style.display='flex';
+  document.getElementById('appShell').style.display='none';
+  STATE.role='employee';
+}
+function switchRole(role){
+  STATE.role=role;
+  STATE.user=USERS[role];
+  document.querySelectorAll('.role-btn').forEach((b,i)=>{b.classList.toggle('active',['employee','manager','admin'][i]===role)});
+  initApp();
+  toast('info',`Switched to ${STATE.user.role} view`);
+}
+function initApp(){
+  const u=STATE.user;
+  document.getElementById('sidebarName').textContent=u.name;
+  document.getElementById('sidebarRole').textContent=u.role;
+  document.getElementById('sidebarAvatar').textContent=u.initials;
+  document.getElementById('sidebarAvatar').style.background=u.bgColor;
+  document.getElementById('sidebarAvatar').style.color=u.color;
+  renderNav();
+  navigateTo('pageDashboard');
+}
+function renderNav(){
+  const nav = NAV[STATE.role];
+  const html = nav.map(item=>`
+    <div class="nav-item" id="nav-${item.id}" onclick="navigateTo('${item.id}')">
+      <span class="nav-icon">${item.icon}</span>
+      <span>${item.label}</span>
+      ${item.badge?`<span class="nav-badge">${item.badge}</span>`:''}
+    </div>`).join('');
+  document.getElementById('navItems').innerHTML='<div class="sidebar-section">'+html+'</div>';
+}
+function navigateTo(pageId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const page = document.getElementById(pageId);
+  if(page){page.classList.add('active');renderPage(pageId);}
+  const navEl = document.getElementById('nav-'+pageId);
+  if(navEl) navEl.classList.add('active');
+  STATE.currentPage=pageId;
+  const titles={pageDashboard:'Dashboard',pageGoals:'My Goals',pageTeam:STATE.role==='admin'?'All Employees':'Team Goals',pageCheckIn:'Quarterly Check-ins',pageReports:'Reports & Exports',pageAudit:'Audit Logs',pageCycles:'Goal Cycles',pageEscalations:'Escalations',pageAnalytics:'Analytics'};
+  document.getElementById('topbarTitle').textContent=titles[pageId]||'Dashboard';
+}
+function renderPage(id){
+  const fns={pageDashboard:renderDashboard,pageGoals:renderGoals,pageTeam:renderTeam,pageCheckIn:renderCheckIn,pageReports:renderReports,pageAudit:renderAudit,pageCycles:renderCycles,pageEscalations:renderEscalations,pageAnalytics:renderAnalytics};
+  if(fns[id]) fns[id]();
+}
+
+function circularSVG(pct,color,size=56){
+  const r=20,c=size/2,stroke=4,circ=2*Math.PI*r;
+  const dash=circ*(pct/100),gap=circ-dash;
+  return `<svg width="${size}" height="${size}" class="progress-ring" role="img" aria-label="${pct}% complete">
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--bg3)" stroke-width="${stroke}"/>
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-dasharray="${dash} ${gap}" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 ${c} ${c})"/>
+    <text x="${c}" y="${c+1}" text-anchor="middle" dominant-baseline="middle" fill="var(--text)" font-size="${size<50?9:11}" font-weight="700" transform="rotate(90 ${c} ${c})">${pct}%</text>
+  </svg>`;
+}
+
+function renderDashboard(){
+  const approved = STATE.goals.filter(g=>g.status==='approved');
+  const avgProgress = approved.length ? Math.round(approved.reduce((a,g)=>a+g.progress,0)/approved.length) : 0;
+  const role = STATE.role;
+  let html = '';
+  if(role==='employee'){
+    html=`
+    <div class="section-header"><div><div class="section-title">Welcome back, ${STATE.user.name} 👋</div><div class="section-sub">FY 2024-25 · Goal Setting Cycle · Q1 Check-in Open</div></div>
+    <button class="btn btn-primary" onclick="navigateTo('pageGoals')">+ Add Goal</button></div>
+    <div class="grid-4">
+      <div class="kpi-card blue"><div class="kpi-label">Total Goals</div><div class="kpi-value">5</div><div class="kpi-change neutral">4 approved · 1 pending</div></div>
+      <div class="kpi-card green"><div class="kpi-label">Avg Progress</div><div class="kpi-value">${avgProgress}%</div><div class="kpi-change up">↑ 12% from last month</div></div>
+      <div class="kpi-card amber"><div class="kpi-label">Weightage Used</div><div class="kpi-value">100%</div><div class="kpi-change neutral">All goals balanced</div></div>
+      <div class="kpi-card purple"><div class="kpi-label">Check-in Status</div><div class="kpi-value">Q1</div><div class="kpi-change up">Open until July 31</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><b>My Goals Overview</b><span class="tag tag-approved">4 Approved</span></div>
+      ${STATE.goals.map(g=>`
+        <div style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <div style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">${g.title}</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;color:var(--text3)">${g.weightage}%</span>
+              <span class="tag tag-${g.status}">${g.status}</span>
+            </div>
+          </div>
+          <div class="progress-bar-wrap"><div class="progress-bar ${g.progress>70?'green':g.progress>40?'amber':'red'}" style="width:${g.progress}%"></div></div>
+          <div style="font-size:11px;color:var(--text3)">${g.progress}% complete · ${g.q1Status}</div>
+        </div>`).join('')}
+      </div>
+      <div class="card"><div style="margin-bottom:16px"><b>Q1 Progress Snapshot</b></div>
+        <div style="display:flex;justify-content:space-around;align-items:center;padding:16px 0">
+          ${circularSVG(avgProgress,'var(--accent)',80)}
+          <div style="text-align:center">
+            <div style="font-size:32px;font-weight:800;color:var(--green)">4</div>
+            <div style="font-size:11px;color:var(--text3)">On Track</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:32px;font-weight:800;color:var(--amber)">1</div>
+            <div style="font-size:11px;color:var(--text3)">Not Started</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div style="margin-top:12px"><b style="font-size:13px">Recent Activity</b></div>
+        ${STATE.auditLog.slice(0,3).map(a=>`<div class="activity-item">
+          <div class="activity-dot" style="background:${a.type==='approve'?'var(--green)':a.type==='reject'?'var(--red)':'var(--accent)'}"></div>
+          <div class="activity-content"><div class="activity-text"><strong>${a.user}</strong> ${a.action} ${a.detail}</div><div class="activity-time">${a.time}</div></div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="card"><div style="margin-bottom:16px"><b>AI Performance Insights</b> <span class="ai-chip">✨ AI Powered</span></div>
+      <div class="grid-3" style="margin-bottom:0">
+        <div style="background:var(--bg3);border-radius:var(--radius);padding:14px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">GOAL QUALITY SCORE</div>
+          <div style="font-size:24px;font-weight:800;color:var(--green)">87/100</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px">Goals are well-defined and measurable</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--radius);padding:14px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">ALIGNMENT SCORE</div>
+          <div style="font-size:24px;font-weight:800;color:var(--accent)">92%</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px">High alignment with company OKRs</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--radius);padding:14px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">AI RECOMMENDATION</div>
+          <div style="font-size:12px;color:var(--amber);margin-top:4px">💡 "Zero Critical Incidents" goal needs Q1 progress update to avoid escalation</div>
+        </div>
+      </div>
+    </div>`;
+  } else if(role==='manager'){
+    const pending = STATE.teamGoals.filter(g=>g.submitted&&!g.approved).length;
+    const approved2 = STATE.teamGoals.filter(g=>g.approved).length;
+    const avgTeam = Math.round(STATE.teamGoals.filter(g=>g.approved).reduce((a,g)=>a+g.progress,0)/Math.max(1,approved2));
+    html=`
+    <div class="section-header"><div><div class="section-title">Manager Dashboard</div><div class="section-sub">Engineering Team · 6 direct reports</div></div>
+    <button class="btn btn-primary" onclick="navigateTo('pageTeam')">Review Pending →</button></div>
+    <div class="grid-4">
+      <div class="kpi-card blue"><div class="kpi-label">Team Size</div><div class="kpi-value">6</div><div class="kpi-change neutral">Direct reports</div></div>
+      <div class="kpi-card amber"><div class="kpi-label">Pending Approval</div><div class="kpi-value">${pending}</div><div class="kpi-change down">↑ Action required</div></div>
+      <div class="kpi-card green"><div class="kpi-label">Approved</div><div class="kpi-value">${approved2}</div><div class="kpi-change up">of ${STATE.teamGoals.length} team members</div></div>
+      <div class="kpi-card purple"><div class="kpi-label">Team Progress</div><div class="kpi-value">${avgTeam}%</div><div class="kpi-change up">↑ 8% this quarter</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center"><b>Team Progress</b><button class="btn btn-ghost btn-sm" onclick="navigateTo('pageTeam')">View All</button></div>
+        ${STATE.teamGoals.map(m=>`<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div class="avatar" style="background:var(--bg3);color:var(--text2);font-size:10px">${m.name.split(' ').map(n=>n[0]).join('')}</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">${m.name}</div>
+          <div class="progress-bar-wrap" style="margin:4px 0 2px"><div class="progress-bar ${m.progress>70?'green':m.progress>40?'amber':'blue'}" style="width:${m.progress||5}%"></div></div>
+          <div style="font-size:11px;color:var(--text3)">${m.progress}% · ${m.goals} goals</div></div>
+          <span class="tag ${m.approved?'tag-approved':m.submitted?'tag-submitted':'tag-draft'}">${m.approved?'Approved':m.submitted?'Pending':'Not Submitted'}</span>
+        </div>`).join('')}
+      </div>
+      <div class="card"><div style="margin-bottom:16px"><b>Pending Actions</b></div>
+        ${STATE.teamGoals.filter(g=>g.submitted&&!g.approved).map(m=>`
+        <div style="background:var(--amber-bg);border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius);padding:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+          <div><div style="font-size:13px;font-weight:600;color:var(--text)">${m.name}</div><div style="font-size:11px;color:var(--amber)">Goal sheet awaiting approval · ${m.goals} goals</div></div>
+          <button class="btn btn-success btn-sm" onclick="navigateTo('pageTeam')">Review</button>
+        </div>`).join('')}
+        <div style="background:var(--red-bg);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius);padding:12px;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:600;color:var(--text)">Anita Roy</div>
+          <div style="font-size:11px;color:var(--red)">Has not submitted goals — escalation in 2 days</div>
+        </div>
+      </div>
+    </div>`;
+  } else {
+    html=`
+    <div class="section-header"><div><div class="section-title">Admin Dashboard</div><div class="section-sub">Organization-wide performance overview</div></div>
+    <button class="btn btn-primary" onclick="navigateTo('pageCycles')">Manage Cycles</button></div>
+    <div class="grid-4">
+      <div class="kpi-card blue"><div class="kpi-label">Total Employees</div><div class="kpi-value">247</div><div class="kpi-change neutral">Across 8 departments</div></div>
+      <div class="kpi-card green"><div class="kpi-label">Goal Completion</div><div class="kpi-value">76%</div><div class="kpi-change up">↑ 4% vs last cycle</div></div>
+      <div class="kpi-card amber"><div class="kpi-label">Pending Approvals</div><div class="kpi-value">34</div><div class="kpi-change down">Across 12 managers</div></div>
+      <div class="kpi-card purple"><div class="kpi-label">Escalations</div><div class="kpi-value">3</div><div class="kpi-change down">↑ Requires attention</div></div>
+    </div>
+    <div class="grid-3">
+      <div class="card"><div style="margin-bottom:16px"><b>Completion by Department</b></div>
+        ${[['Engineering','82%',82,'var(--accent)'],['Sales','91%',91,'var(--green)'],['Product','68%',68,'var(--amber)'],['HR & Ops','79%',79,'var(--teal)'],['Finance','55%',55,'var(--red)']].map(([d,p,n,c])=>`
+          <div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;color:var(--text2)">${d}</span><span style="font-size:12px;font-weight:700;color:var(--text)">${p}</span></div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:${n}%;background:${c}"></div></div></div>`).join('')}
+      </div>
+      <div class="card"><div style="margin-bottom:16px"><b>Submission Status</b></div>
+        <div style="display:flex;justify-content:space-around;text-align:center;padding:8px 0">
+          <div><div style="font-size:28px;font-weight:800;color:var(--green)">187</div><div style="font-size:11px;color:var(--text3)">Approved</div></div>
+          <div><div style="font-size:28px;font-weight:800;color:var(--amber)">34</div><div style="font-size:11px;color:var(--text3)">Pending</div></div>
+          <div><div style="font-size:28px;font-weight:800;color:var(--red)">26</div><div style="font-size:11px;color:var(--text3)">Not Submitted</div></div>
+        </div>
+        <div class="divider"></div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">Quick Actions</div>
+        <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-bottom:6px" onclick="navigateTo('pageEscalations')">⚡ View 3 Escalations</button>
+        <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="navigateTo('pageAudit')">🔍 Audit Logs</button>
+      </div>
+      <div class="card"><div style="margin-bottom:16px"><b>Recent Audit Trail</b></div>
+        <div class="scrollable">
+          ${STATE.auditLog.map(a=>`<div class="activity-item">
+            <div class="activity-dot" style="background:${a.type==='approve'?'var(--green)':a.type==='reject'?'var(--red)':a.type==='admin'?'var(--purple)':'var(--accent)'}"></div>
+            <div class="activity-content"><div class="activity-text"><strong>${a.user}</strong> ${a.action}: ${a.detail}</div><div class="activity-time">${a.time}</div></div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }
+  document.getElementById('pageDashboard').innerHTML=html;
+}
+
+function renderGoals(){
+  const totalWeight = STATE.goals.reduce((a,g)=>a+g.weightage,0);
+  const isValid = totalWeight===100;
+  const canSubmit = STATE.role==='employee' && STATE.goals.some(g=>g.status==='draft');
+  const allSubmitted = STATE.goals.every(g=>g.status!=='draft');
+  let html=`
+  <div class="section-header">
+    <div><div class="section-title">My Goals</div><div class="section-sub">FY 2024-25 · Goal Setting Cycle · Max 8 goals allowed</div></div>
+    <div style="display:flex;gap:8px">
+      ${STATE.role==='employee'?`<button class="btn btn-ghost" onclick="openGoalModal()">+ Add Goal</button>
+      <button class="btn btn-primary ${allSubmitted?'':''}\" onclick="submitGoals()" ${allSubmitted?'disabled':''} style="${allSubmitted?'opacity:0.5;cursor:not-allowed':''}">📤 Submit to Manager</button>`:''}
+    </div>
+  </div>
+  <div class="validation-bar ${isValid?'valid':'invalid'}" style="display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:20px">${isValid?'✅':'⚠️'}</span>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text)">Weightage Validation</div>
+        <div style="font-size:12px;color:var(--text3)">${isValid?'Total weightage is 100% — ready to submit':'Total weightage must equal 100% to submit'}</div>
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div class="weightage-total" style="color:${isValid?'var(--green)':'var(--red)'}">${totalWeight}%</div>
+      <div style="font-size:11px;color:var(--text3)">of 100% required</div>
+    </div>
+  </div>
+  <div style="margin-top:16px">
+  ${STATE.goals.map(g=>`
+    <div class="goal-card">
+      <div class="goal-card-header">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            ${g.shared?'<span style="font-size:10px;background:var(--teal-bg);color:var(--teal);padding:2px 6px;border-radius:4px;font-weight:600">SHARED</span>':''}
+            <span class="tag tag-${g.status}">${g.status.toUpperCase()}</span>
+          </div>
+          <div class="goal-title">${g.title}</div>
+          <div class="goal-meta">${g.thrust} · ${g.uom} · Target: ${g.target}${g.uom==='Percentage'?'%':''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="text-align:right">
+            <div style="font-size:18px;font-weight:800;color:var(--text)">${g.weightage}%</div>
+            <div style="font-size:10px;color:var(--text3)">Weightage</div>
+          </div>
+          ${circularSVG(g.progress,g.progress>70?'var(--green)':g.progress>40?'var(--amber)':'var(--red)',52)}
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px">${g.desc}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="tag tag-${g.q1Status.replace(' ','').toLowerCase()}">${g.q1Status}</span>
+          <span style="font-size:12px;color:var(--text3)">Achievement: ${g.achievement}${g.uom==='Percentage'?'%':''} / ${g.target}${g.uom==='Percentage'?'%':''}</span>
+        </div>
+        ${g.status==='draft'&&STATE.role==='employee'?`<div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm" onclick="editGoal(${g.id})">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteGoal(${g.id})">🗑</button>
+        </div>`:''}
+        ${g.status==='approved'&&STATE.role==='employee'?`<button class="btn btn-ghost btn-sm" onclick="updateAchievement(${g.id})">📊 Update Q1</button>`:''}
+      </div>
+    </div>`).join('')}
+  </div>
+  ${STATE.goals.length===0?`<div class="empty-state"><div class="empty-icon">🎯</div><div style="font-size:16px;font-weight:600">No goals yet</div><p>Click "Add Goal" to create your first goal for this cycle</p><button class="btn btn-primary" style="margin-top:16px" onclick="openGoalModal()">+ Add Your First Goal</button></div>`:''}
+  `;
+  document.getElementById('pageGoals').innerHTML=html;
+}
+
+function renderTeam(){
+  const pending = STATE.teamGoals.filter(g=>g.submitted&&!g.approved);
+  const approved = STATE.teamGoals.filter(g=>g.approved);
+  let html=`
+  <div class="section-header"><div><div class="section-title">${STATE.role==='admin'?'All Employees':'Team Goals'}</div><div class="section-sub">${pending.length} pending approvals</div></div>
+  ${STATE.role==='admin'?`<button class="btn btn-primary" onclick="pushSharedGoal()">📤 Push Shared Goal</button>`:''}</div>
+  <div class="grid-3" style="margin-bottom:20px">
+    <div class="kpi-card blue"><div class="kpi-label">Total Members</div><div class="kpi-value">${STATE.teamGoals.length}</div></div>
+    <div class="kpi-card amber"><div class="kpi-label">Pending Review</div><div class="kpi-value">${pending.length}</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Approved</div><div class="kpi-value">${approved.length}</div></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Employee</th><th>Goals</th><th>Weightage</th><th>Progress</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        ${STATE.teamGoals.map((m,i)=>`<tr>
+          <td><div style="display:flex;align-items:center;gap:8px">
+            <div class="avatar" style="width:28px;height:28px;font-size:9px;background:var(--bg3);color:var(--text2)">${m.name.split(' ').map(n=>n[0]).join('')}</div>
+            <div><div style="font-weight:600;color:var(--text)">${m.name}</div><div style="font-size:11px;color:var(--text3)">${m.role}</div></div>
+          </div></td>
+          <td>${m.goals}</td>
+          <td>100%</td>
+          <td style="width:120px">
+            <div class="progress-bar-wrap" style="margin:0"><div class="progress-bar ${m.progress>70?'green':m.progress>40?'amber':'blue'}" style="width:${m.progress||3}%"></div></div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px">${m.progress}%</div>
+          </td>
+          <td><span class="tag tag-${m.approved?'approved':m.submitted?'submitted':'draft'}">${m.approved?'Approved':m.submitted?'Pending Review':'Not Submitted'}</span></td>
+          <td>
+            ${m.submitted&&!m.approved?`<button class="btn btn-success btn-sm" onclick="reviewGoal(${i})">✅ Approve</button>
+            <button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="rejectGoal(${i})">✕ Reject</button>`:
+            m.approved?'<span style="color:var(--green);font-size:12px">✓ Done</span>':
+            '<span style="color:var(--text3);font-size:12px">Awaiting</span>'}
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+  document.getElementById('pageTeam').innerHTML=html;
+}
+
+function renderCheckIn(){
+  const quarters=[{q:'Q1',window:'May–July',status:'Open',active:true},{q:'Q2',window:'Aug–Oct',status:'Upcoming',active:false},{q:'Q3',window:'Nov–Jan',status:'Locked',active:false},{q:'Q4',window:'Feb–Apr',status:'Locked',active:false}];
+  let html=`
+  <div class="section-header"><div><div class="section-title">Quarterly Check-ins</div><div class="section-sub">Track your progress quarter by quarter</div></div></div>
+  <div class="grid-4" style="margin-bottom:24px">
+    ${quarters.map(q=>`<div class="card" style="${q.active?'border-color:var(--accent);background:var(--accent-bg)':''}">
+      <div style="font-size:20px;font-weight:800;color:var(--text)">${q.q}</div>
+      <div style="font-size:12px;color:var(--text3)">${q.window}</div>
+      <div style="margin-top:8px"><span class="tag ${q.status==='Open'?'tag-approved':q.status==='Upcoming'?'tag-submitted':'tag-draft'}">${q.status}</span></div>
+    </div>`).join('')}
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <b>Q1 Achievement Update</b>
+      <span class="tag tag-approved">Window Open</span>
+    </div>
+    <div class="table-wrap" style="border:none">
+      <table>
+        <thead><tr><th>Goal</th><th>Target</th><th>Achievement</th><th>Progress</th><th>Status</th><th>Update</th></tr></thead>
+        <tbody>
+          ${STATE.goals.filter(g=>g.status==='approved').map(g=>`<tr>
+            <td><div style="font-weight:600;color:var(--text);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${g.title}</div><div style="font-size:11px;color:var(--text3)">${g.thrust}</div></td>
+            <td>${g.target}${g.uom==='Percentage'?'%':''}</td>
+            <td style="font-weight:600;color:var(--text)">${g.achievement}${g.uom==='Percentage'?'%':''}</td>
+            <td><div class="progress-bar-wrap" style="margin:0;width:80px"><div class="progress-bar ${g.progress>70?'green':g.progress>40?'amber':'red'}" style="width:${g.progress}%"></div></div><span style="font-size:11px;color:var(--text3)">${g.progress}%</span></td>
+            <td><span class="tag tag-${g.q1Status.replace(' ','').toLowerCase()}">${g.q1Status}</span></td>
+            <td><button class="btn btn-ghost btn-sm" onclick="updateAchievement(${g.id})">📊 Update</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+  document.getElementById('pageCheckIn').innerHTML=html;
+}
+
+function renderReports(){
+  let html=`
+  <div class="section-header"><div><div class="section-title">Reports & Exports</div><div class="section-sub">Analytics and data exports for the current cycle</div></div>
+  <button class="btn btn-primary" onclick="exportReport()">📥 Export CSV</button></div>
+  <div class="grid-3" style="margin-bottom:24px">
+    <div class="card" style="cursor:pointer;transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:28px;margin-bottom:8px">📊</div><div style="font-weight:700;color:var(--text)">Achievement Report</div><div style="font-size:12px;color:var(--text3);margin-top:4px">Planned vs Actual for all goals</div>
+      <div style="margin-top:12px"><span class="tag tag-approved">247 employees</span></div>
+    </div>
+    <div class="card" style="cursor:pointer;transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:28px;margin-bottom:8px">✅</div><div style="font-weight:700;color:var(--text)">Check-in Completion</div><div style="font-size:12px;color:var(--text3);margin-top:4px">Who completed Q1 check-ins</div>
+      <div style="margin-top:12px"><span class="tag tag-submitted">Q1 Open</span></div>
+    </div>
+    <div class="card" style="cursor:pointer;transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:28px;margin-bottom:8px">🎯</div><div style="font-weight:700;color:var(--text)">Goal Completion</div><div style="font-size:12px;color:var(--text3);margin-top:4px">End-of-cycle summary</div>
+      <div style="margin-top:12px"><span class="tag tag-draft">Cycle Active</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between"><b>Planned vs Actual — Q1 Summary</b></div>
+    <div class="table-wrap" style="border:none">
+      <table>
+        <thead><tr><th>Employee</th><th>Goals</th><th>Status</th><th>Avg Progress</th><th>On Track</th><th>Check-in</th></tr></thead>
+        <tbody>
+          ${STATE.teamGoals.map(m=>`<tr>
+            <td style="font-weight:600;color:var(--text)">${m.name}</td>
+            <td>${m.goals}</td>
+            <td><span class="tag tag-${m.approved?'approved':m.submitted?'submitted':'draft'}">${m.approved?'Approved':m.submitted?'Submitted':'Draft'}</span></td>
+            <td>${m.approved?m.progress+'%':'—'}</td>
+            <td>${m.approved?`<span style="color:var(--green)">✓ ${Math.round(m.goals*0.7)}</span>`:'—'}</td>
+            <td>${m.approved?'<span class="tag tag-completed">Done</span>':'<span class="tag tag-notstarted">Pending</span>'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+  document.getElementById('pageReports').innerHTML=html;
+}
+
+function renderAudit(){
+  let html=`
+  <div class="section-header"><div><div class="section-title">Audit Logs</div><div class="section-sub">Full governance trail for all actions</div></div>
+  <button class="btn btn-ghost" onclick="toast('info','Audit export started')">📥 Export Logs</button></div>
+  <div class="grid-4" style="margin-bottom:20px">
+    <div class="kpi-card blue"><div class="kpi-label">Total Events</div><div class="kpi-value">1,247</div><div class="kpi-change neutral">This cycle</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Approvals</div><div class="kpi-value">187</div><div class="kpi-change up">↑ Goal approvals</div></div>
+    <div class="kpi-card amber"><div class="kpi-label">Edits</div><div class="kpi-value">342</div><div class="kpi-change neutral">Field modifications</div></div>
+    <div class="kpi-card purple"><div class="kpi-label">Admin Actions</div><div class="kpi-value">54</div><div class="kpi-change neutral">Unlock/Push</div></div>
+  </div>
+  <div class="card">
+    <div style="margin-bottom:16px;display:flex;align-items:center;gap:12px">
+      <b>Activity Timeline</b>
+      <select class="form-input form-select" style="width:150px;padding:6px 10px">
+        <option>All actions</option><option>Approvals</option><option>Edits</option><option>Admin</option>
+      </select>
+    </div>
+    ${STATE.auditLog.map(a=>`<div class="activity-item">
+      <div class="activity-dot" style="width:10px;height:10px;background:${a.type==='approve'?'var(--green)':a.type==='reject'?'var(--red)':a.type==='admin'?'var(--purple)':'var(--accent)'}"></div>
+      <div class="activity-content">
+        <div class="activity-text"><strong>${a.user}</strong> ${a.action}: <em style="color:var(--text)">${a.detail}</em></div>
+        <div class="activity-time">${a.time}</div>
+      </div>
+      <span class="tag tag-${a.type==='approve'?'approved':a.type==='reject'?'rejected':a.type==='admin'?'locked':'submitted'}">${a.type.toUpperCase()}</span>
+    </div>`).join('')}
+  </div>`;
+  document.getElementById('pageAudit').innerHTML=html;
+}
+
+function renderCycles(){
+  let html=`
+  <div class="section-header"><div><div class="section-title">Goal Cycles</div><div class="section-sub">Manage performance cycles and windows</div></div>
+  <button class="btn btn-primary" onclick="toast('success','New cycle created')">+ New Cycle</button></div>
+  <div class="table-wrap" style="margin-bottom:24px">
+    <table>
+      <thead><tr><th>Cycle</th><th>Type</th><th>Status</th><th>Goal Setting</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700;color:var(--text)">FY 2024-25</td><td>Annual</td>
+          <td><span class="tag tag-approved">Active</span></td>
+          <td><span class="tag tag-completed">Closed May</span></td>
+          <td><span class="tag tag-approved">Open</span></td>
+          <td><span class="tag tag-draft">Locked</span></td>
+          <td><span class="tag tag-draft">Locked</span></td>
+          <td><span class="tag tag-draft">Locked</span></td>
+          <td><button class="btn btn-ghost btn-sm" onclick="toast('info','Cycle settings opened')">⚙ Configure</button></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--text)">FY 2023-24</td><td>Annual</td>
+          <td><span class="tag tag-draft">Closed</span></td>
+          <td><span class="tag tag-completed">Closed</span></td>
+          <td><span class="tag tag-completed">Closed</span></td>
+          <td><span class="tag tag-completed">Closed</span></td>
+          <td><span class="tag tag-completed">Closed</span></td>
+          <td><span class="tag tag-completed">Closed</span></td>
+          <td><button class="btn btn-ghost btn-sm" onclick="toast('info','Archive viewed')">👁 View</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid-2">
+    <div class="card"><div style="margin-bottom:16px"><b>Unlock Goals</b><div style="font-size:12px;color:var(--text3);margin-top:2px">Grant temporary edit access to locked goals</div></div>
+      <div class="form-group"><label class="form-label">Employee</label><input class="form-input" placeholder="Search employee..." value="Arjun Kumar"></div>
+      <div class="form-group"><label class="form-label">Reason</label><textarea class="form-input" rows="2" placeholder="Amendment reason...">Q1 amendment — target adjustment approved</textarea></div>
+      <button class="btn btn-primary" onclick="toast('success','Goals unlocked for Arjun Kumar')">🔓 Unlock Goals</button>
+    </div>
+    <div class="card"><div style="margin-bottom:16px"><b>Push Shared KPI</b><div style="font-size:12px;color:var(--text3);margin-top:2px">Broadcast departmental goals to all employees</div></div>
+      <div class="form-group"><label class="form-label">Goal Title</label><input class="form-input" value="Department OKR Alignment Score"></div>
+      <div class="form-group"><label class="form-label">Target</label><input class="form-input" value="90%"></div>
+      <div class="form-group"><label class="form-label">Push To</label><select class="form-input form-select"><option>All Engineering</option><option>All Sales</option><option>Entire Org</option></select></div>
+      <button class="btn btn-primary" onclick="toast('success','Shared goal pushed to Engineering team!')">📤 Push to Team</button>
+    </div>
+  </div>`;
+  document.getElementById('pageCycles').innerHTML=html;
+}
+
+function renderEscalations(){
+  const escalations=[
+    {type:'critical',emoji:'🔴',name:'Anita Roy',issue:'No goals submitted',days:7,role:'Employee → Manager → HR',assignee:'Priya Sharma'},
+    {type:'warning',emoji:'🟠',name:'Vikram Nair',issue:'Manager approval pending > 5 days',days:5,role:'Manager → HR',assignee:'Rohan Verma'},
+    {type:'info',emoji:'🟡',name:'Deepak Joshi',issue:'Q1 check-in incomplete — 3 days remaining',days:3,role:'Employee',assignee:'Priya Sharma'},
+  ];
+  let html=`
+  <div class="section-header"><div><div class="section-title">Escalations</div><div class="section-sub">Rule-based escalation monitoring</div></div></div>
+  <div class="grid-3" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-label">Critical</div><div class="kpi-value" style="color:var(--red)">1</div></div>
+    <div class="kpi-card"><div class="kpi-label">Warning</div><div class="kpi-value" style="color:var(--amber)">1</div></div>
+    <div class="kpi-card"><div class="kpi-label">Info</div><div class="kpi-value" style="color:var(--accent)">1</div></div>
+  </div>
+  <div class="card">
+    <div style="margin-bottom:16px"><b>Active Escalations</b></div>
+    ${escalations.map(e=>`<div class="escalation-item">
+      <div class="esc-icon" style="background:${e.type==='critical'?'var(--red-bg)':e.type==='warning'?'var(--amber-bg)':'var(--accent-bg)'}">
+        ${e.emoji}
+      </div>
+      <div style="flex:1">
+        <div style="font-weight:600;color:var(--text)">${e.name}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">${e.issue} · Escalated to: ${e.role}</div>
+        <div style="font-size:11px;color:var(--text3)">Assignee: ${e.assignee}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;font-weight:700;color:${e.type==='critical'?'var(--red)':e.type==='warning'?'var(--amber)':'var(--accent)'}">+${e.days} days</div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="toast('info','Reminder sent to ${e.name}')">📧 Remind</button>
+      </div>
+    </div>`).join('')}
+  </div>
+  <div class="card" style="margin-top:16px"><div style="margin-bottom:12px"><b>Escalation Rules</b></div>
+    ${[['Employee submission','No goal submission within 30 days of cycle start','Auto-escalate to manager after 7 days'],
+       ['Manager approval','No approval within 5 days of submission','Auto-escalate to HR Admin'],
+       ['Q1 check-in','No check-in update within window period','Reminder 3 days before, escalate on deadline']].map(([name,trigger,action])=>`
+      <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">${name}</div>
+        <div style="font-size:12px;color:var(--text3)">Trigger: ${trigger}</div>
+        <div style="font-size:12px;color:var(--accent)">Action: ${action}</div></div>
+        <span class="tag tag-approved">Active</span>
+      </div>`).join('')}
+  </div>`;
+  document.getElementById('pageEscalations').innerHTML=html;
+}
+
+function renderAnalytics(){
+  let html=`
+  <div class="section-header"><div><div class="section-title">Analytics</div><div class="section-sub">Comprehensive performance intelligence</div></div>
+  <span class="ai-chip">✨ AI Insights Active</span></div>
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div style="margin-bottom:16px"><b>Goal Progress by Thrust Area</b></div>
+      <div class="chart-container"><canvas id="thrustChart" role="img" aria-label="Bar chart showing goal progress by thrust area">Progress by thrust area: Sales 87%, Customer Experience 74%, Digital Transformation 58%, Risk and Compliance 45%, People and Culture 91%.</canvas></div>
+    </div>
+    <div class="card">
+      <div style="margin-bottom:16px"><b>Q1 Status Distribution</b></div>
+      <div class="chart-container"><canvas id="statusChart" role="img" aria-label="Donut chart showing goal status distribution">Status: On Track 52%, Not Started 18%, Completed 20%, At Risk 10%.</canvas></div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div style="margin-bottom:16px"><b>QoQ Progress Trend</b></div>
+      <div class="chart-container"><canvas id="trendChart" role="img" aria-label="Line chart showing quarterly progress trend">Q1: 45%, Q2: 62%, Q3: 78%, Q4: projected 88%.</canvas></div>
+    </div>
+    <div class="card">
+      <div style="margin-bottom:16px"><b>Manager Effectiveness Leaderboard</b></div>
+      ${[['Priya Sharma','Engineering',92,'var(--green)'],['Arjun Desai','Sales',87,'var(--accent)'],['Kavita Rao','Product',79,'var(--amber)'],['Suresh Pillai','Finance',64,'var(--red)']].map(([name,dept,score,color],i)=>`
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div style="width:20px;font-size:12px;font-weight:700;color:var(--text3)">#${i+1}</div>
+          <div class="avatar" style="width:32px;height:32px;font-size:10px;background:var(--bg3);color:var(--text2)">${name.split(' ').map(n=>n[0]).join('')}</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">${name}</div>
+            <div class="progress-bar-wrap" style="margin:4px 0 0"><div class="progress-bar" style="width:${score}%;background:${color}"></div></div>
+          </div>
+          <div style="font-size:15px;font-weight:800;color:${color}">${score}%</div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+  document.getElementById('pageAnalytics').innerHTML=html;
+  setTimeout(()=>{
+    const thrustCtx=document.getElementById('thrustChart');
+    if(thrustCtx&&!STATE.charts.thrust){
+      STATE.charts.thrust=new Chart(thrustCtx,{type:'bar',data:{labels:['Sales','CX','Digital','Risk','People'],datasets:[{label:'Progress %',data:[87,74,58,45,91],backgroundColor:['#4f7dff','#22c55e','#f59e0b','#ef4444','#a855f7'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{color:'#8b97b5',callback:v=>v+'%'},grid:{color:'#2a3347'}},x:{ticks:{color:'#8b97b5'},grid:{display:false}}}}});
+    }
+    const statusCtx=document.getElementById('statusChart');
+    if(statusCtx&&!STATE.charts.status){
+      STATE.charts.status=new Chart(statusCtx,{type:'doughnut',data:{labels:['On Track','Completed','Not Started','At Risk'],datasets:[{data:[52,20,18,10],backgroundColor:['#22c55e','#14b8a6','#5a6580','#ef4444'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'65%'}});
+    }
+    const trendCtx=document.getElementById('trendChart');
+    if(trendCtx&&!STATE.charts.trend){
+      STATE.charts.trend=new Chart(trendCtx,{type:'line',data:{labels:['Q1','Q2','Q3','Q4 (proj)'],datasets:[{label:'Actual',data:[45,62,78,null],borderColor:'#4f7dff',backgroundColor:'rgba(79,125,255,0.1)',fill:true,tension:0.4,pointBackgroundColor:'#4f7dff',pointRadius:5},{label:'Projected',data:[null,null,78,88],borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,0.05)',borderDash:[6,3],fill:true,tension:0.4,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{color:'#8b97b5',callback:v=>v+'%'},grid:{color:'#2a3347'}},x:{ticks:{color:'#8b97b5'},grid:{display:false}}}}});
+    }
+  },100);
+}
+
+function openGoalModal(){
+  document.getElementById('goalModalTitle').textContent='Add New Goal';
+  const thrusts=['Sales Excellence','Customer Experience','Digital Transformation','Risk & Compliance','People & Culture','Innovation','Operational Efficiency'];
+  const uoms=['Numeric','Percentage','Timeline','Zero-Based'];
+  document.getElementById('goalModalBody').innerHTML=`
+    <div class="form-group"><label class="form-label">Thrust Area</label><select class="form-input form-select" id="newThrust">${thrusts.map(t=>`<option>${t}</option>`).join('')}</select></div>
+    <div class="form-group"><label class="form-label">Goal Title</label><input class="form-input" id="newTitle" placeholder="Enter a clear, measurable goal title..."></div>
+    <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="newDesc" rows="2" placeholder="Describe the goal and its business impact..."></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div class="form-group"><label class="form-label">Unit of Measure</label><select class="form-input form-select" id="newUom">${uoms.map(u=>`<option>${u}</option>`).join('')}</select></div>
+      <div class="form-group"><label class="form-label">Target</label><input class="form-input" id="newTarget" type="number" placeholder="e.g. 100"></div>
+      <div class="form-group"><label class="form-label">Weightage %</label><input class="form-input" id="newWeight" type="number" placeholder="Min 10%"></div>
+    </div>
+    <div id="goalFormError" class="form-error" style="margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeGoalModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveGoal()">+ Add Goal</button>
+    </div>`;
+  document.getElementById('goalModal').classList.add('open');
+}
+
+function closeGoalModal(){document.getElementById('goalModal').classList.remove('open');}
+function closeCommentModal(){document.getElementById('commentModal').classList.remove('open');}
+function closeNotifModal(){document.getElementById('notifModal').classList.remove('open');}
+
+function saveGoal(){
+  const title=document.getElementById('newTitle').value.trim();
+  const thrust=document.getElementById('newThrust').value;
+  const desc=document.getElementById('newDesc').value.trim();
+  const uom=document.getElementById('newUom').value;
+  const target=parseFloat(document.getElementById('newTarget').value)||0;
+  const weight=parseFloat(document.getElementById('newWeight').value)||0;
+  const err=document.getElementById('goalFormError');
+  const currentTotal=STATE.goals.reduce((a,g)=>a+g.weightage,0);
+  if(!title){err.textContent='Goal title is required';return;}
+  if(weight<10){err.textContent='Minimum weightage is 10%';return;}
+  if(currentTotal+weight>100){err.textContent=`Adding ${weight}% would exceed 100% total (currently ${currentTotal}%)`;return;}
+  if(STATE.goals.length>=8){err.textContent='Maximum 8 goals allowed per cycle';return;}
+  STATE.goals.push({id:Date.now(),title,thrust,desc,uom,target,weightage:weight,status:'draft',progress:0,achievement:0,q1Status:'Not Started',quarter:'Q1',createdBy:'employee',shared:false});
+  closeGoalModal();
+  toast('success','Goal added successfully!');
+  renderGoals();
+}
+
+function deleteGoal(id){
+  STATE.goals=STATE.goals.filter(g=>g.id!==id);
+  toast('info','Goal removed');
+  renderGoals();
+}
+
+function submitGoals(){
+  const drafts=STATE.goals.filter(g=>g.status==='draft');
+  const total=STATE.goals.reduce((a,g)=>a+g.weightage,0);
+  if(total!==100){toast('error','Total weightage must be exactly 100% to submit');return;}
+  drafts.forEach(g=>g.status='submitted');
+  STATE.auditLog.unshift({time:'Just now',user:STATE.user.name,action:'Submitted goal sheet',detail:`${STATE.goals.length} goals, total weightage 100%`,type:'submit'});
+  toast('success','Goal sheet submitted to manager! 🎉');
+  renderGoals();
+}
+
+function reviewGoal(idx){
+  const m=STATE.teamGoals[idx];
+  document.getElementById('commentModalBody').innerHTML=`
+    <div style="background:var(--bg3);border-radius:var(--radius);padding:12px;margin-bottom:16px">
+      <div style="font-weight:600;color:var(--text)">${m.name} · ${m.role}</div>
+      <div style="font-size:12px;color:var(--text3)">${m.goals} goals submitted</div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:8px">INLINE EDIT TARGETS</div>
+      ${STATE.goals.filter(g=>g.status==='submitted'||g.status==='approved').slice(0,2).map(g=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--bg3);border-radius:var(--radius);margin-bottom:6px">
+          <div style="font-size:12px;color:var(--text);flex:1">${g.title}</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:11px;color:var(--text3)">Target:</span>
+            <input class="inline-edit" value="${g.target}">
+            <span style="font-size:11px;color:var(--text3)">Weight:</span>
+            <input class="inline-edit" value="${g.weightage}%">
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="form-group"><label class="form-label">Comments</label><textarea class="form-input" rows="3" placeholder="Add feedback or approval notes...">Goals look well-structured. Revenue target is achievable based on Q4 pipeline.</textarea></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-danger" onclick="rejectGoal(${idx});closeCommentModal()">✕ Reject</button>
+      <button class="btn btn-success" onclick="approveGoal(${idx});closeCommentModal()">✅ Approve All</button>
+    </div>`;
+  document.getElementById('commentModal').classList.add('open');
+}
+
+function approveGoal(idx){
+  STATE.teamGoals[idx].approved=true;
+  STATE.auditLog.unshift({time:'Just now',user:STATE.user.name,action:'Approved goal sheet',detail:`${STATE.teamGoals[idx].name} — ${STATE.teamGoals[idx].goals} goals locked`,type:'approve'});
+  toast('success',`${STATE.teamGoals[idx].name}'s goals approved and locked ✅`);
+  renderTeam();
+}
+
+function rejectGoal(idx){
+  STATE.teamGoals[idx].submitted=false;
+  STATE.teamGoals[idx].approved=false;
+  STATE.auditLog.unshift({time:'Just now',user:STATE.user.name,action:'Rejected goal sheet',detail:`${STATE.teamGoals[idx].name} — returned for rework`,type:'reject'});
+  toast('error',`${STATE.teamGoals[idx].name}'s goals rejected — returned for revision`);
+  renderTeam();
+}
+
+function updateAchievement(id){
+  const g=STATE.goals.find(x=>x.id===id);
+  if(!g) return;
+  const newAch=prompt(`Update Q1 achievement for:\n"${g.title}"\n\nCurrent: ${g.achievement}\nTarget: ${g.target}\n\nEnter new achievement:`,g.achievement);
+  if(newAch===null) return;
+  const val=parseFloat(newAch)||0;
+  g.achievement=val;
+  g.progress=Math.min(100,Math.round((val/g.target)*100));
+  g.q1Status=g.progress>=100?'Completed':g.progress>0?'On Track':'Not Started';
+  STATE.auditLog.unshift({time:'Just now',user:STATE.user.name,action:'Updated achievement',detail:`${g.title}: ${g.achievement} → ${val}`,type:'edit'});
+  toast('success',`Achievement updated — ${g.progress}% complete`);
+  if(STATE.currentPage==='pageGoals') renderGoals();
+  if(STATE.currentPage==='pageCheckIn') renderCheckIn();
+}
+
+function pushSharedGoal(){
+  toast('success','Shared goal pushed to Engineering team (8 employees)');
+  STATE.auditLog.unshift({time:'Just now',user:STATE.user.name,action:'Pushed shared goal',detail:'New Departmental KPI pushed to Engineering',type:'admin'});
+}
+
+function exportReport(){
+  toast('success','📥 Report exported as CSV (247 records)');
+}
+
+function showNotif(){
+  document.getElementById('notifList').innerHTML=STATE.notifications.map(n=>`
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${n.type==='success'?'var(--green)':n.type==='error'?'var(--red)':n.type==='warning'?'var(--amber)':'var(--accent)'}"></div>
+      <div class="activity-content">
+        <div class="activity-text">${n.msg}</div>
+        <div class="activity-time">${n.time}</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('notifModal').classList.add('open');
+}
+
+function editGoal(id){
+  const g=STATE.goals.find(x=>x.id===id);
+  if(!g||g.status==='approved') return;
+  alert(`Edit goal: "${g.title}"\nUse the Add Goal form to create a similar goal. Editing is available in the full app.`);
+}
+
+function toast(type,msg,duration=3500){
+  const ct=document.getElementById('toastContainer');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  const icons={success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};
+  t.innerHTML=`<span>${icons[type]||'•'}</span><span style="flex:1;color:var(--text)">${msg}</span><span onclick="this.parentNode.remove()" style="cursor:pointer;color:var(--text3);font-size:12px">✕</span>`;
+  ct.appendChild(t);
+  setTimeout(()=>{t.style.animation='fadeOut 0.3s ease forwards';setTimeout(()=>t.remove(),300);},duration);
+}
+
+document.getElementById('goalModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeGoalModal()});
+document.getElementById('commentModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCommentModal()});
+document.getElementById('notifModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeNotifModal()});
+</script>
+</body>
+</html>
